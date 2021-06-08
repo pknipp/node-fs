@@ -26,7 +26,7 @@ class Login extends Component {
       <main className="centered middled">
 
         <form className="auth" onSubmit={this.handleSubmit}>
-        <h1>Welcome to my redux-fs!</h1>
+        <h1>Welcome to my react/node-fs!</h1>
         <h4>I hope that you will either login or signup.</h4>
           <span>Email address:</span>
           <input type="text" placeholder="" value={this.state.email} onChange={this.updateEmail} />

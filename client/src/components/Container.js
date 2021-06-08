@@ -17,7 +17,7 @@ class Container extends React.Component {
     return (
       <BrowserRouter>
         <nav>
-          <h1>{this.props.email}: Welcome to my redux-fs!</h1>
+          <h1>{this.props.email}: Welcome to my react/node-fs!</h1>
 
           <div className="nav-bar">
             <span><NavLink className="nav" exact to="/"    activeClassName="active">Home          </NavLink></span>
