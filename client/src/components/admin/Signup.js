@@ -1,74 +1,110 @@
-import React, { Component } from 'react';
+import React, { useState, useContext } from 'react';
 import { Redirect, NavLink } from 'react-router-dom';
-import { connect } from 'react-redux';
-import { signup, editUser, resetMessage, deleteUser } from './store/authentication';
+import AuthContext from '../../auth';
+// import { signup, editUser, resetMessage, deleteUser } from './store/authentication';
 // import { Input, Button } from '@material-ui/core';
 
-class Signup extends Component {
-  constructor(props) { super(props);
-    this.state = {
-      email: this.props.update ? this.props.currentUserEmail : "",
-      password: "",
-      password2: "" };
+const Signup = ({update}) => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [password2, setPassword2] = useState('');
+  const [message, setMessage] = useState('');
+  const { fetchWithCSRF, currentUser, setCurrentUser } = useContext(AuthContext);
+  const [errors, setErrors] = useState([]);
+
+  // componentDidMount() {this.props.resetMessage()};
+
+  const signup = async (email, password) => {
+    const res = await fetch(`/api/users`, { method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
+    });
+    let user = (await res.json()).user;
+    // dispatch(res.ok ? setUser(data.user) : setMessage(data.error.errors[0].msg));
+    setCurrentUser(user);
+  };
+
+  const editUser = async (email, password, id) => {
+    const res = await fetch(`/api/users`, { method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password, id })
+    });
+    let user = (await res.json()).user;
+    // dispatch(res.ok ? setUser(data.user) : setMessage(data.error.errors[0].msg));
+    setCurrentUser(user);
+  };
+
+  const deleteUser = async id => {
+    const res = await fetch(`/api/users/${id}`, { method: 'DELETE'});
+    // if (res.ok) dispatch(removeUser());
+    let data = await res.json();
+    if (!data.message) {
+      setCurrentUser(null);
+    } else {
+      setMessage(data.message);
+    }
   }
 
-  componentDidMount() {this.props.resetMessage()};
-
-  handleSubmit = e => {
+  const handleSubmit = e => {
     e.preventDefault();
-    let { email, password } = this.state;
     let message = !email ? "Email address is needed." :
                   !password?"Password is needed." :
-                  password !== this.state.password2 ? "Passwords must match" : "";
-    if (message) return this.setState({ message });
-    this.setState({ message: "" }, () => {
-      this.props.update ? this.props.editUser(email, password, this.props.currentUserId) : this.props.signup(email, password)})
+                  password !== password2 ? "Passwords must match" : "";
+    setMessage(message);
+    if (!message) {
+      if (update) {
+        editUser(email, password, currentUser.id);
+      } else {
+        signup(email, password);
+      }
+    }
   }
 
-  handleDelete = e => {
+  const handleDelete = e => {
     e.preventDefault();
-    this.props.deleteUser(this.props.currentUserId);
+    deleteUser(currentUser.id);
   }
 
-  updateInput = e => this.setState({ [e.target.name]: e.target.value });
-
-  render() {
-    let { state, props, updateInput, handleSubmit, handleDelete } = this;
-    let { update, currentUserId } = props;
-    let { email, password, password2 } = state;
-    return (currentUserId && !update) ? <Redirect to="/" /> : (
-      <main className="centered middled">
-        <form className="auth" onSubmit={handleSubmit}>
-        <h1>{update ? null : "Welcome to my redux-fs template!"}</h1>
-        <h4>{update ? "Change your email and/or password?" : "I hope that you will either login or signup."}</h4>
-          <span>Email address:</span>
-          <input type="text" placeholder="Email" name="email" value={email} onChange={updateInput} />
-          <span>Password:</span>
-          <input type="password" placeholder="" name="password" value={password} onChange={updateInput} />
-          <span>Confirm password:</span>
-          <input type="password" placeholder="" name="password2" value={password2} onChange={updateInput} />
-          <button color="primary" variant="outlined" type="submit">{update ? "Submit changes" : "Signup"}</button>
-          <span style={{color: "red", paddingLeft:"10px"}}>{ state.message || props.message }</span>
-          {update ? null : <span><NavLink className="nav" to="/login"      activeClassName="active">Login</NavLink></span>}
-        </form>
-        {!update ? null : <form className="auth" onSubmit={handleDelete}>
-          <button color="primary" variant="outlined" type="submit">{"Delete account?"}</button>
-        </form>}
-
-      </main>
-    );
-  }
+  return (currentUser && !update) ? <Redirect to="/" /> : (
+    <main className="centered middled">
+      <form className="auth" onSubmit={handleSubmit}>
+        <h1>
+          {update ? null : "Welcome to my react/node-fs template!"}
+        </h1>
+        <h4>
+          {update ? "Change your email and/or password?" : "I hope that you will either login or signup."}
+        </h4>
+        <span>Email address:</span>
+        <input
+          type="text" placeholder="Email" name="email" value={email}
+          onChange={e => setEmail(e.target.value)}
+        />
+        <span>Password:</span>
+        <input
+          type="password" placeholder="" name="password" value={password}
+          onChange={e => setPassword(e.target.value)}
+        />
+        <span>Confirm password:</span>
+        <input
+          type="password" placeholder="" name="password2" value={password2}
+          onChange={e => setPassword2(e.target.value)}
+        />
+        <button color="primary" variant="outlined" type="submit">
+          {update ? "Submit changes" : "Signup"}
+        </button>
+        <span style={{color: "red", paddingLeft:"10px"}}>{message}</span>
+        {update ? null :
+          <span>
+            <NavLink className="nav" to="/login" activeClassName="active">
+              Login
+            </NavLink>
+          </span>}
+      </form>
+      {!update ? null : <form className="auth" onSubmit={handleDelete}>
+        <button color="primary" variant="outlined" type="submit">{"Delete account?"}</button>
+      </form>}
+    </main>
+  );
 }
 
-const msp = state => ({
-  currentUserId: state.authentication.id,
-  currentUserEmail: state.authentication.email,
-  message: state.authentication.message
-});
-const mdp = dispatch => ({
-  signup: (email, password) => dispatch(signup(email, password)),
-  editUser:(email,password,id) => dispatch(editUser(email,password,id)),
-  resetMessage: _ => dispatch(resetMessage()),
-  deleteUser: id => dispatch(deleteUser(id)),
-})
-export default connect(msp, mdp)(Signup);
+export default Signup;
