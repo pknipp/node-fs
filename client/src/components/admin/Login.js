@@ -1,9 +1,6 @@
 import React, { useState, useContext } from 'react';
-import { Redirect, NavLink, useHistory } from 'react-router-dom';
+import { Redirect, NavLink } from 'react-router-dom';
 import AuthContext from '../../auth';
-// import { connect } from 'react-redux';
-// import { login } from './store/authentication';
-// import { Input, Button } from '@material-ui/core';
 
 const Login = () => {
   const [email, setEmail] = useState("demo@aol.com");
@@ -11,7 +8,6 @@ const Login = () => {
   const [errors, setErrors] = useState([]);
   const [message, setMessage] = useState('');
   const { fetchWithCSRF, currentUser, setCurrentUser } = useContext(AuthContext);
-  let history = useHistory();
 
   const login = async (email, password) => {
     const response = await fetch(`/api/session`, { method: 'PUT',
@@ -40,7 +36,10 @@ const Login = () => {
       <h1>Welcome to my react/node-fs!</h1>
       <h4>I hope that you will either login or signup.</h4>
         <span>Email address:</span>
-        <input type="text" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} />
+        <input
+          type="text" placeholder="Email" value={email}
+          onChange={e => setEmail(e.target.value)}
+        />
         <span>Password:</span>
         <input
           type="password" placeholder="Password" value={password}
@@ -54,6 +53,4 @@ const Login = () => {
   );
 }
 
-// const msp = state => ({ currentUserId: state.authentication.id, message: state.authentication.message });
-// const mdp = dispatch => ({ login: (email, password) => dispatch(login(email, password))})
 export default Login;

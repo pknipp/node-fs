@@ -22,6 +22,4 @@ const Logout = () => {
   );
 }
 
-// const msp = state => ({ currentUserId: state.authentication.id });
-// const mdp = dispatch => ({ logout: () => dispatch(logout())})
 export default Logout;

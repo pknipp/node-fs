@@ -4,7 +4,7 @@ import AuthContext from '../../auth';
 // import { signup, editUser, resetMessage, deleteUser } from './store/authentication';
 // import { Input, Button } from '@material-ui/core';
 
-const Signup = ({update}) => {
+const Signup = () => {
   const { fetchWithCSRF, currentUser, setCurrentUser } = useContext(AuthContext);
   const [email, setEmail] = useState(currentUser ? currentUser.email : '');
   const [password, setPassword] = useState('');
@@ -12,8 +12,6 @@ const Signup = ({update}) => {
   const [message, setMessage] = useState('');
 
   const [errors, setErrors] = useState([]);
-
-  // componentDidMount() {this.props.resetMessage()};
 
   const signup = async (email, password) => {
     const res = await fetch(`/api/users`, { method: 'POST',
@@ -23,6 +21,7 @@ const Signup = ({update}) => {
     let user = (await res.json()).user;
     // dispatch(res.ok ? setUser(data.user) : setMessage(data.error.errors[0].msg));
     setCurrentUser(user);
+    setMessage("Success!");
   };
 
   const editUser = async (email, password, id) => {
@@ -54,10 +53,10 @@ const Signup = ({update}) => {
                   password !== password2 ? "Passwords must match" : "";
     setMessage(message);
     if (!message) {
-      if (update) {
-        editUser(email, password, currentUser.id);
-      } else {
+      if (currentUser) {
         signup(email, password);
+      } else {
+        editUser(email, password, currentUser.id);
       }
     }
   }
@@ -67,14 +66,14 @@ const Signup = ({update}) => {
     deleteUser(currentUser.id);
   }
 
-  return (currentUser && !update) ? <Redirect to="/" /> : (
+  return !currentUser ? <Redirect to="/" /> : (
     <main className="centered middled">
       <form className="auth" onSubmit={handleSubmit}>
         <h1>
-          {update ? null : "Welcome to my react/node-fs template!"}
+          {currentUser ? null : "Welcome to my react/node-fs template!"}
         </h1>
         <h4>
-          {update ? "Change your email and/or password?" : "I hope that you will either login or signup."}
+          {currentUser ? "Change your email and/or password?" : "I hope that you will either login or signup."}
         </h4>
         <span>Email address:</span>
         <input
@@ -92,17 +91,17 @@ const Signup = ({update}) => {
           onChange={e => setPassword2(e.target.value)}
         />
         <button color="primary" variant="outlined" type="submit">
-          {update ? "Submit changes" : "Signup"}
+          {currentUser ? "Submit changes" : "Signup"}
         </button>
         <span style={{color: "red", paddingLeft:"10px"}}>{message}</span>
-        {update ? null :
+        {currentUser ? null :
           <span>
             <NavLink className="nav" to="/login" activeClassName="active">
               Login
             </NavLink>
           </span>}
       </form>
-      {!update ? null : <form className="auth" onSubmit={handleDelete}>
+      {!currentUser ? null : <form className="auth" onSubmit={handleDelete}>
         <button color="primary" variant="outlined" type="submit">{"Delete account?"}</button>
       </form>}
     </main>
