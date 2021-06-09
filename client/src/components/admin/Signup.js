@@ -1,5 +1,5 @@
 import React, { useState, useContext } from 'react';
-import { Redirect, NavLink } from 'react-router-dom';
+import { Redirect, NavLink, useHistory } from 'react-router-dom';
 import AuthContext from '../../auth';
 // import { signup, editUser, resetMessage, deleteUser } from './store/authentication';
 // import { Input, Button } from '@material-ui/core';
@@ -10,8 +10,8 @@ const Signup = () => {
   const [password, setPassword] = useState('');
   const [password2, setPassword2] = useState('');
   const [message, setMessage] = useState('');
-
   const [errors, setErrors] = useState([]);
+  let history = useHistory();
 
   const signup = async (email, password) => {
     const res = await fetch(`/api/users`, { method: 'POST',
@@ -21,7 +21,7 @@ const Signup = () => {
     let user = (await res.json()).user;
     // dispatch(res.ok ? setUser(data.user) : setMessage(data.error.errors[0].msg));
     setCurrentUser(user);
-    setMessage("Success!");
+    if (res.ok) history.push('/');
   };
 
   const editUser = async (email, password, id) => {
@@ -54,9 +54,9 @@ const Signup = () => {
     setMessage(message);
     if (!message) {
       if (currentUser) {
-        signup(email, password);
-      } else {
         editUser(email, password, currentUser.id);
+      } else {
+        signup(email, password);
       }
     }
   }
@@ -66,7 +66,7 @@ const Signup = () => {
     deleteUser(currentUser.id);
   }
 
-  return !currentUser ? <Redirect to="/" /> : (
+  return (
     <main className="centered middled">
       <form className="auth" onSubmit={handleSubmit}>
         <h1>

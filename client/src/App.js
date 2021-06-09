@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter, Switch, Route, Redirect } from 'react-router-dom';
 import Cookies from "js-cookie";
-// import { connect } from 'react-redux';
 import Login from './components/admin/Login';
 import Signup from './components/admin/Signup';
 import Container from "./components/Container";
 import AuthContext from './auth';
-// import { store } from './index';
 
 const PrivateRoute = ({ component: Component, ...rest }) => (
   <Route {...rest} render={(props) => (
@@ -53,6 +51,4 @@ const App = () => {
     </AuthContext.Provider>
   );
 }
-// const msp = state => ({ currentUserId: state.authentication.id, needLogin: !state.authentication.id});
-// export default connect(msp)(App);
 export default App;

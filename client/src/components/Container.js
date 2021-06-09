@@ -39,8 +39,7 @@ const Container = () => {
       </nav>
       <Switch>
         <Route path="/logout"    component={Logout}   />
-        <Route path="/feature1"      component={Feature1}     />
-        {/* <Route path="/account"   component={Account} /> */}
+        <Route path="/feature1"      component={Feature1}/>
         <Route path="/manageuser"   component={Signup}/>}/>
         <Route path="/"          component={Home} />
       </Switch>
