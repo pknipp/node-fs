@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter, Switch, Route, Redirect } from 'react-router-dom';
+import Cookies from "js-cookie";
 // import { connect } from 'react-redux';
 import Login from './components/admin/Login';
 import Signup from './components/admin/Signup';
@@ -16,8 +17,32 @@ const PrivateRoute = ({ component: Component, ...rest }) => (
 const App = () => {
   const [fetchWithCSRF] = useState(() => fetch);
   const [currentUser, setCurrentUser] = useState(null);
-  const [loading] = useState(true)
+  const [loading, setLoading] = useState(true)
   const authContextValue = {fetchWithCSRF, currentUser, setCurrentUser};
+
+  const loadUser = () => {
+    const authToken = Cookies.get("token");
+    if (authToken) {
+      try {
+        const payloadObj = JSON.parse(atob(authToken.split(".")[1]))
+        setCurrentUser(payloadObj.data);
+      } catch (e) {
+        Cookies.remove("token");
+      }
+    }
+    setLoading(false);
+  }
+
+  useEffect(loadUser, []);
+
+//   useEffect(() => {
+//     (async () => {
+//         const response = await fetch('/restore');
+//         const data = await response.json();
+//         setCurrentUser(data.current_user);
+//         setLoading(false);
+//     })()
+// }, [])
 
   return (
     <AuthContext.Provider value={authContextValue}>
@@ -30,7 +55,7 @@ const App = () => {
             <Route path="/signup" component={Signup} />
             <PrivateRoute path="/"
             // exact={true}
-            needLogin={this.props.needLogin} component={Container} />
+            needLogin={!currentUser} component={Container} />
           </Switch>
         </BrowserRouter>
       }
