@@ -35,15 +35,6 @@ const App = () => {
 
   useEffect(loadUser, []);
 
-//   useEffect(() => {
-//     (async () => {
-//         const response = await fetch('/restore');
-//         const data = await response.json();
-//         setCurrentUser(data.current_user);
-//         setLoading(false);
-//     })()
-// }, [])
-
   return (
     <AuthContext.Provider value={authContextValue}>
       {loading ?

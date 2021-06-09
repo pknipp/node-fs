@@ -5,11 +5,12 @@ import AuthContext from '../../auth';
 // import { Input, Button } from '@material-ui/core';
 
 const Signup = ({update}) => {
-  const [email, setEmail] = useState('');
+  const { fetchWithCSRF, currentUser, setCurrentUser } = useContext(AuthContext);
+  const [email, setEmail] = useState(currentUser ? currentUser.email : '');
   const [password, setPassword] = useState('');
   const [password2, setPassword2] = useState('');
   const [message, setMessage] = useState('');
-  const { fetchWithCSRF, currentUser, setCurrentUser } = useContext(AuthContext);
+
   const [errors, setErrors] = useState([]);
 
   // componentDidMount() {this.props.resetMessage()};
@@ -32,6 +33,7 @@ const Signup = ({update}) => {
     let user = (await res.json()).user;
     // dispatch(res.ok ? setUser(data.user) : setMessage(data.error.errors[0].msg));
     setCurrentUser(user);
+    setMessage("Success!");
   };
 
   const deleteUser = async id => {
