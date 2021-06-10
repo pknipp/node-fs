@@ -79,8 +79,8 @@ router.get('/me', authenticated, function(req, res) {
   res.json({ email: req.user.email });
 });
 
-router.delete("/:id", [authenticated], asyncHandler(async(req, res) => {
-  const user = await User.findByPk(Number(req.params.id));
+router.delete("", [authenticated], asyncHandler(async (req, res, next) => {
+  const user = req.user;
   if (user.id === 1) return res.json({ message: "You cannot delete my 'demo' user, because visitors to my site use that for testing purposes.  Create a new user via the 'Signup' route if you'd like to test out the deletion of a user." })
   user.tokenId = null;
   res.clearCookie('token');

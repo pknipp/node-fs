@@ -35,8 +35,8 @@ const Signup = () => {
     setMessage("Success!");
   };
 
-  const deleteUser = async id => {
-    const res = await fetch(`/api/users/${id}`, { method: 'DELETE'});
+  const deleteUser = async () => {
+    const res = await fetch("/api/users", { method: 'DELETE'});
     // if (res.ok) dispatch(removeUser());
     let data = await res.json();
     if (!data.message) {
@@ -63,7 +63,7 @@ const Signup = () => {
 
   const handleDelete = e => {
     e.preventDefault();
-    deleteUser(currentUser.id);
+    deleteUser();
   }
 
   return (
