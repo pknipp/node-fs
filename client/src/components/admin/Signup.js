@@ -24,15 +24,16 @@ const Signup = () => {
     if (res.ok) history.push('/');
   };
 
-  const editUser = async (email, password, id) => {
+  const editUser = async (email, password) => {
     const res = await fetch(`/api/users`, { method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password, id })
+      body: JSON.stringify({ email, password })
     });
     let user = (await res.json()).user;
     // dispatch(res.ok ? setUser(data.user) : setMessage(data.error.errors[0].msg));
     setCurrentUser(user);
-    setMessage("Success!");
+    // setMessage("Success!");
+    if (res.ok) history.push('/');
   };
 
   const deleteUser = async () => {
@@ -54,7 +55,7 @@ const Signup = () => {
     setMessage(message);
     if (!message) {
       if (currentUser) {
-        editUser(email, password, currentUser.id);
+        editUser(email, password);
       } else {
         signup(email, password);
       }

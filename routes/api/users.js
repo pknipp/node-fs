@@ -14,7 +14,7 @@ const email = check('email').isEmail().withMessage('Give a valid email address')
 const password = check('password').not().isEmpty().withMessage('Provide a password');
 
 router.post('/', email, password,
-  asyncHandler(async function (req, res, next) {
+  asyncHandler(async (req, res, next) => {
     let message;
     const errors = validationResult(req).errors;
     let response = { user: {} };
@@ -29,7 +29,7 @@ router.post('/', email, password,
         const { jti, token } = generateToken(user);
         user.tokenId = jti;
         res.cookie("token", token);
-        response.token = token;
+        // response.token = token;
         response.user = {...response.user, ...user.toSafeObject()}
         await user.save();
       }
@@ -38,12 +38,11 @@ router.post('/', email, password,
     res.json(response);
 }));
 
-router.put('/', email, password,
-  asyncHandler(async function (req, res, next) {
-  let user = await User.findByPk(req.body.id);
-  const { jti, token } = generateToken(user);
-  user.tokenId = jti;
-  res.cookie("token", token);
+router.put('/', [authenticated], email, password, asyncHandler(async (req, res, next) => {
+  let user = req.user;
+  // const { jti, token } = generateToken(user);
+  // user.tokenId = jti;
+  // res.cookie("token", token);
   let message = "Success!";
   const errors = validationResult(req).errors;
   if (user.id === 1) {
@@ -64,8 +63,13 @@ router.put('/', email, password,
     } else {
       user.email = req.body.email;
       user = user.setPassword(req.body.password);
+      delete user.tokenId;
+      const { jti, token } = generateToken(user);
+      user.tokenId = jti;
+      res.cookie("token", token);
     }
   }
+  console.log("before user.save, user = ", user);
   await user.save();
   res.json({ token, user: {...user.toSafeObject(), message }});
 }));
