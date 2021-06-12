@@ -40,9 +40,6 @@ router.post('/', email, password,
 
 router.put('/', [authenticated], email, password, asyncHandler(async (req, res, next) => {
   let user = req.user;
-  // const { jti, token } = generateToken(user);
-  // user.tokenId = jti;
-  // res.cookie("token", token);
   let message = "Success!";
   const errors = validationResult(req).errors;
   if (user.id === 1) {
@@ -69,9 +66,8 @@ router.put('/', [authenticated], email, password, asyncHandler(async (req, res, 
       res.cookie("token", token);
     }
   }
-  console.log("before user.save, user = ", user);
   await user.save();
-  res.json({ token, user: {...user.toSafeObject(), message }});
+  res.json({user: {...user.toSafeObject(), message}});
 }));
 
 router.get('/', asyncHandler(async function (req, res, next) {

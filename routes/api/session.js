@@ -34,7 +34,6 @@ router.put('/', [email, password],
   user.tokenId = jti;
   await user.save();
   res.cookie('token', token);
-  // console.log('jti and token are ', jti, token);
   res.json({ token, user: user.toSafeObject() });
 }));
 

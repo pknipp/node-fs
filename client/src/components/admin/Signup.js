@@ -1,8 +1,6 @@
 import React, { useState, useContext } from 'react';
-import { Redirect, NavLink, useHistory } from 'react-router-dom';
+import { NavLink, useHistory } from 'react-router-dom';
 import AuthContext from '../../auth';
-// import { signup, editUser, resetMessage, deleteUser } from './store/authentication';
-// import { Input, Button } from '@material-ui/core';
 
 const Signup = () => {
   const { fetchWithCSRF, currentUser, setCurrentUser } = useContext(AuthContext);
@@ -30,10 +28,8 @@ const Signup = () => {
       body: JSON.stringify({ email, password })
     });
     let user = (await res.json()).user;
-    // dispatch(res.ok ? setUser(data.user) : setMessage(data.error.errors[0].msg));
-    setCurrentUser(user);
-    // setMessage("Success!");
-    if (res.ok) history.push('/');
+    setMessage(user.message);
+    if (res.ok) setCurrentUser(user);
   };
 
   const deleteUser = async () => {
