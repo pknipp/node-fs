@@ -3,7 +3,7 @@ const asyncHandler = require('express-async-handler');
 const { check, validationResult } = require('express-validator');
 const Sequelize = require('sequelize');
 const { create } = require("../../db/user-repository")
-const { User } = require('../../db/models');
+const { User, Session } = require('../../db/models');
 const { authenticated, generateToken } = require('./security-utils');
 
 const router = express.Router();
@@ -15,6 +15,7 @@ const password = check('password').not().isEmpty().withMessage('Provide a passwo
 
 router.post('/', email, password,
   asyncHandler(async (req, res, next) => {
+    try {
     let message;
     const errors = validationResult(req).errors;
     if (errors.length) return res.status(400).json({message: errors[0].msg});
@@ -28,7 +29,7 @@ router.post('/', email, password,
       } else {
         const user = await create(req.body);
         const { tokenId, token } = generateToken(user);
-        const session = await Session.create({userId: user.id, tokenId});
+        await Session.create({userId: user.id, tokenId});
         res.cookie("token", token);
         // response.token = token;
         response.user = {...response.user, ...user.toSafeObject()}
@@ -36,6 +37,9 @@ router.post('/', email, password,
     }
     response.user.message = message;
     res.json(response);
+  } catch(e){
+    console.log(e)
+  }
 }));
 
 router.put('/', [authenticated], email, password, asyncHandler(async (req, res, next) => {
