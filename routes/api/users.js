@@ -17,6 +17,7 @@ router.post('/', email, password,
   asyncHandler(async (req, res, next) => {
     let message;
     const errors = validationResult(req).errors;
+    if (errors.length) return res.status(400).json({message: errors[0].msg});
     let response = { user: {} };
     if (errors.length) {
       message = errors[0].msg;
