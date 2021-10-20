@@ -21,9 +21,6 @@ module.exports = (sequelize, DataTypes) => {
       //   //   len: [1, 255],
       //   // },
       // },
-      tokenId: {
-        type: DataTypes.STRING
-      },
       hashedPassword: {
         allowNull: false,
         type: DataTypes.STRING.BINARY,
@@ -50,7 +47,9 @@ module.exports = (sequelize, DataTypes) => {
     }
   );
 
-  User.associate = function(models) {};
+  User.associate = function(models) {
+    User.hasMany(models.Session, {foreignKey: 'userId'});
+  };
 
   User.prototype.toSafeObject = function () {
     return {

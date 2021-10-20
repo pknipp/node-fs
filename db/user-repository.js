@@ -1,4 +1,4 @@
-const { User } = require('./models');
+const { User, Session } = require('./models');
 
 class NullUser {
   isValid() { return false; }
@@ -25,7 +25,8 @@ async function findByEmail(email) {
 }
 
 async function findByTokenId(tokenId) {
-  const user = await User.findOne({ where: { tokenId } });
+  const session = await Session.findOne({ where: tokenId });
+  const user = session && await User.findByPk(session.userId);
   return user || new NullUser();
 }
 
