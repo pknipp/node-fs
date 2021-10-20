@@ -13,7 +13,7 @@ const password = check('password').not().isEmpty().withMessage('Provide password
 
 router.get('/', asyncHandler(async function (req, res, next) {res.json({message: "Hello world"});}));
 
-router.put('/', [email, password],
+router.post('/', [email, password],
   asyncHandler(async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) return next({ status: 422, errors: errors.array() });
@@ -22,6 +22,7 @@ router.put('/', [email, password],
   try {
     user = await UserRepository.findByEmail(email);
   } catch (e) {
+    console.error(e)
     return next({ status: 401, message: "UserRepo.findByEmail did not work" });
   }
   if (!user.isValidPassword(password)) {

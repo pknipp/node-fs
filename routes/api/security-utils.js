@@ -6,11 +6,12 @@ const UserRepository = require('../../db/user-repository');
 
 function generateToken(user) {
   const data = user.toSafeObject();
-  const jwtid = uuid();
+  const tokenId = uuid();
+  console.log("sec-utils says that tokenId = ", tokenId)
 
   return {
-    tokenId: jwtid,
-    token: jwt.sign({ data }, secret, { expiresIn: Number.parseInt(expiresIn), jwtid })
+    tokenId,
+    token: jwt.sign({ data }, secret, { expiresIn: Number.parseInt(expiresIn), jwtid: tokenId })
   };
 }
 
@@ -34,7 +35,7 @@ function restoreUser(req, res, next) {
       user.tokenId = tokenId;
       req.user = user;
     } catch (e) {
-      console.log(e);
+      console.error(e);
       res.clearCookie("token");
       return next({ status: 401, message: "user not found" });
     }

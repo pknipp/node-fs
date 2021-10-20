@@ -10,7 +10,7 @@ const Login = () => {
   const { fetchWithCSRF, currentUser, setCurrentUser } = useContext(AuthContext);
 
   const login = async (email, password) => {
-    const response = await fetch(`/api/session`, { method: 'PUT',
+    const response = await fetch(`/api/session`, { method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password })
     });
