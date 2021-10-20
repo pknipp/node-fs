@@ -4,6 +4,7 @@ const { check, validationResult } = require('express-validator');
 
 const UserRepository = require('../../db/user-repository');
 const { authenticated, generateToken } = require('./security-utils');
+const { Session } = require('../../db/models');
 
 const router = express.Router();
 
@@ -30,17 +31,20 @@ router.put('/', [email, password],
     err.errors = ['Invalid1 credentials'];
     return next(err);
   }
-  const { jti, token } = generateToken(user);
-  user.tokenId = jti;
-  await user.save();
+  const { tokenId, token } = generateToken(user);
+  await Session.create({userId: user.id, tokenId});
+  // user.tokenId = jti;
+  // await user.save();
   res.cookie('token', token);
   res.json({ token, user: user.toSafeObject() });
 }));
 
 router.delete('/', [authenticated],
   asyncHandler(async (req, res) => {
-  req.user.tokenId = null;
-  await req.user.save();
+  const session = await Session.findOne({where: {tokenId: req.user.tokenId}});
+  await session.destroy();
+  //req.user.tokenId = null;
+  // await req.user.save();
   res.clearCookie('token');
   res.json({ message: 'success' });
 }));

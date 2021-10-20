@@ -27,12 +27,11 @@ router.post('/', email, password,
         message = "That email is taken.";
       } else {
         const user = await create(req.body);
-        const { jti, token } = generateToken(user);
-        user.tokenId = jti;
+        const { tokenId, token } = generateToken(user);
+        const session = await Session.create({userId: user.id, tokenId});
         res.cookie("token", token);
         // response.token = token;
         response.user = {...response.user, ...user.toSafeObject()}
-        await user.save();
       }
     }
     response.user.message = message;
@@ -61,9 +60,14 @@ router.put('/', [authenticated], email, password, asyncHandler(async (req, res, 
     } else {
       user.email = req.body.email;
       user = user.setPassword(req.body.password);
-      delete user.tokenId;
-      const { jti, token } = generateToken(user);
-      user.tokenId = jti;
+      await user.save();
+      // Find session
+      let tokenId = req.user.tokenId;
+      let session = Session.findOne({where: {tokenId}});
+      // Now that user is edited and session is found, overwrite tokenId in db
+      const { newTokenId, token } = generateToken(user);
+      session = {...session, tokenId: newTokenId}
+      await session.save();
       res.cookie("token", token);
     }
   }

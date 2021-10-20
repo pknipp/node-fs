@@ -25,7 +25,7 @@ async function findByEmail(email) {
 }
 
 async function findByTokenId(tokenId) {
-  const session = await Session.findOne({ where: tokenId });
+  const session = await Session.findOne({ where: {tokenId}});
   const user = session && await User.findByPk(session.userId);
   return user || new NullUser();
 }

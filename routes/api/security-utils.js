@@ -9,7 +9,7 @@ function generateToken(user) {
   const jwtid = uuid();
 
   return {
-    jti: jwtid,
+    tokenId: jwtid,
     token: jwt.sign({ data }, secret, { expiresIn: Number.parseInt(expiresIn), jwtid })
   };
 }
@@ -21,6 +21,7 @@ function restoreUser(req, res, next) {
 
   return jwt.verify(token, secret, null, async (err, payload) => {
     if (err) {
+      console.log("security utils line 24")
       res.clearCookie('token');
       err.status = 401;
       return next(err);
@@ -29,13 +30,17 @@ function restoreUser(req, res, next) {
     const tokenId = payload.jti;
 
     try {
-      req.user = await UserRepository.findByTokenId(tokenId);
+      let user = await UserRepository.findByTokenId(tokenId);
+      user.tokenId = tokenId;
+      req.user = user;
     } catch (e) {
+      console.log(e);
       res.clearCookie("token");
       return next({ status: 401, message: "user not found" });
     }
 
     if (!req.user.isValid()) {
+      console.log("user is not valid?")
       res.clearCookie("token");
       return next({ status: 401, message: 'session not found' });
     }
